@@ -1,17 +1,17 @@
 package apis
 
 import (
-	"fmt"
+	"encoding/json"
 	"gocheese/db"
 	"net/http"
-	"os"
 )
 
+type Body struct {
+	Todos []db.Todo
+}
+
 func getTodos(w http.ResponseWriter, r *http.Request) {
-	db.GetAllTodos()
-	fmt.Fprintf(
-		w,
-		"=>  started  from pid %d.\n",
-		os.Getpid(),
-	)
+	todos := db.GetAllTodos()
+	body := Body{todos}
+	json.NewEncoder(w).Encode(body)
 }

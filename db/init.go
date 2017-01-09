@@ -5,10 +5,15 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+var db_name = "gocheese"
+
 const (
-	DB_NAME = "gocheese"
-	TODOS   = "todos"
+	TODOS = "todos"
 )
+
+func SetDBName(new_name string) {
+	db_name = new_name
+}
 
 var record = func() *mgo.Database {
 	url := "mongodb://localhost"
@@ -16,7 +21,7 @@ var record = func() *mgo.Database {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return session.DB(DB_NAME)
+	return session.DB(db_name)
 }
 
 var TodoColl = func() *mgo.Collection {

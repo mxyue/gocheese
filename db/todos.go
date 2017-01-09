@@ -3,14 +3,17 @@ package db
 import "time"
 
 type Todo struct {
-	content    string
-	created_at time.Time
-	finish_at  time.Time
-	do_num     int
+	Content   string
+	CreatedAt time.Time
 }
 
-func GetAllTodos() Todo {
-	var todo Todo
-	TodoColl().Find(nil).All(&todo)
-	return todo
+func GetAllTodos() []Todo {
+	var todos []Todo
+	TodoColl().Find(nil).All(&todos)
+	return todos
+}
+
+func CreateTodo(todo Todo) error {
+	err := TodoColl().Insert(todo)
+	return err
 }
