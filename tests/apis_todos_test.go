@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"gocheese/apis"
 	"gocheese/db"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 )
@@ -24,7 +26,7 @@ func init() {
 	server = httptest.NewServer(apis.Handlers())
 }
 
-func TestCreateTodo(t *testing.T) {
+func TestGetTodos(t *testing.T) {
 	var client = &http.Client{}
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/todos", server.URL), nil)
 	checkErr(err)
@@ -47,6 +49,27 @@ func TestCreateTodo(t *testing.T) {
 		t.Error("帖子数量为", len(data.Todos))
 		fmt.Println("code: ", res.StatusCode)
 		fmt.Println("todos len: ", len(data.Todos))
+	}
+}
+
+func TestCreateTodo(t *testing.T) {
+	// var client = &http.Client{}
+	// req, err := http.NewRequest("POST", fmt.Sprintf("%s/todos", server.URL), body)
+	res, err := http.PostForm(fmt.Sprintf("%s/todos", server.URL), url.Values{"content": {"新任务"}})
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	fmt.Println(data)
+
+	if res.StatusCode == 200 && err == nil {
+		todos := db.GetAllTodos()
+		fmt.Println("Content:", todos[0].Content)
+		fmt.Println("Content:", todos[1].Content)
+		t.Log("通过")
+	} else {
+		t.Log(res.StatusCode)
+		t.Error(err)
 	}
 }
 
