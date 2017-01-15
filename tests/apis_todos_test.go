@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"gocheese/apis"
 	"gocheese/db"
+	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
-	"time"
 )
 
 var server *httptest.Server
@@ -18,10 +18,10 @@ var server *httptest.Server
 func init() {
 	db.SetDBName("gocheese_test")
 	db.TodoColl().RemoveAll(nil)
-	todo := db.Todo{"第一个任务", time.Now()}
+	todo := db.Todo{Content: "第一个任务"}
 	err := db.TodoColl().Insert(todo)
 	if err != nil {
-		fmt.Println("数据存储不成功")
+		fmt.Println("数据存储不成功:", err)
 	}
 	server = httptest.NewServer(apis.Handlers())
 }
@@ -53,19 +53,31 @@ func TestGetTodos(t *testing.T) {
 }
 
 func TestCreateTodo(t *testing.T) {
-	// var client = &http.Client{}
-	// req, err := http.NewRequest("POST", fmt.Sprintf("%s/todos", server.URL), body)
 	res, err := http.PostForm(fmt.Sprintf("%s/todos", server.URL), url.Values{"content": {"新任务"}})
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
-	var data interface{}
+	var data apis.ResponseBody
 	err = json.Unmarshal(body, &data)
-	fmt.Println(data)
+	fmt.Println("body:", data)
+	id := data.Content["id"]
+	todo := db.FindTodoById(fmt.Sprint(id))
+	if res.StatusCode == 200 && err == nil && todo.Content == "新任务" {
+		t.Log("通过")
+	} else {
+		t.Log(res.StatusCode)
+		t.Error(err)
+	}
+}
 
+func TestDeleteTodo(t *testing.T) {
+	var todo db.Todo
+	db.TodoColl().Find(bson.M{}).One(&todo)
+	var client = &http.Client{}
+	id := todo.Id.Hex()
+	fmt.Println("get id==>", id)
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/todos/%s", server.URL, id), nil)
+	res, err := client.Do(req)
 	if res.StatusCode == 200 && err == nil {
-		todos := db.GetAllTodos()
-		fmt.Println("Content:", todos[0].Content)
-		fmt.Println("Content:", todos[1].Content)
 		t.Log("通过")
 	} else {
 		t.Log(res.StatusCode)
