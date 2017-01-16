@@ -9,6 +9,7 @@ var db_name = "gocheese"
 
 const (
 	TODOS = "todos"
+	USERS = "users"
 )
 
 func SetDBName(new_name string) {
@@ -26,4 +27,8 @@ var record = func() *mgo.Database {
 
 var TodoColl = func() *mgo.Collection {
 	return record().C(TODOS)
+}
+
+var UserColl = func() *mgo.Collection {
+	return record().C(USERS)
 }

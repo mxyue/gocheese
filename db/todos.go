@@ -10,6 +10,17 @@ type Todo struct {
 	Id        bson.ObjectId `bson:"_id,omitempty"`
 	Content   string        `bson:"content"`
 	CreatedAt time.Time     `bson:"created_at"`
+	Dones     []Done
+}
+
+type Done struct {
+	Id        bson.ObjectId `bson:"_id"`
+	CreatedAt time.Time     `bson:"created_at"`
+}
+
+func (t *Todo) AddDone(done Done) int {
+	t.Dones = append(t.Dones, done)
+	return len(t.Dones)
 }
 
 func GetAllTodos() []Todo {
