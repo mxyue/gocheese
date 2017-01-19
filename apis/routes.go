@@ -16,6 +16,6 @@ func Handlers() *mux.Router {
 	r.HandleFunc("/todos", createTodo).Methods("POST")
 	r.HandleFunc("/todos/{id}", deleteTodo).Methods("DELETE")
 
-	r.HandleFunc("/users", createUser).Methods("Post")
+	r.HandleFunc("/users", createUser).Methods("POST")
 	return r
 }

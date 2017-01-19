@@ -32,6 +32,7 @@ func CreateUser(user User, password string) (interface{}, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword(bt_password, bcrypt.DefaultCost)
 	if err != nil {
 		log.Error("create user error", err)
+		return nil, err
 	}
 	user.Password = hashedPassword
 	doc := UserColl().Insert(user)
