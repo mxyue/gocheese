@@ -12,6 +12,8 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
+	var beforeUsers []db.User
+	err := db.UserColl().Find(nil).All(&beforeUsers)
 	params := url.Values{"email": {"test@126.com"}, "password": {"123456"}}
 	res, err := http.PostForm(fmt.Sprintf("%s/users", server.URL), params)
 	defer res.Body.Close()
@@ -21,7 +23,7 @@ func TestCreateUser(t *testing.T) {
 	fmt.Println("body:", data)
 	var users []db.User
 	err = db.UserColl().Find(nil).All(&users)
-	if res.StatusCode == 200 && err == nil && len(users) == 1 {
+	if res.StatusCode == 200 && err == nil && len(users) == (len(beforeUsers)+1) {
 		t.Log("通过")
 	} else {
 		t.Log(res.StatusCode)
