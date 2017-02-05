@@ -4,6 +4,7 @@ import (
     "encoding/json"
     "fmt"
     "gocheese/apis"
+    "gocheese/db"
     "io/ioutil"
     "net/http"
     "net/url"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestCreateSession(t *testing.T) {
-    params := url.Values{"email": {firstUser.Email}, "password": {string(firstUser.Password)}}
+    params := url.Values{"email": {firstUser.Email}, "password": {"123456"}}
     res, err := http.PostForm(fmt.Sprintf("%s/sessions", server.URL), params)
     defer res.Body.Close()
     body, err := ioutil.ReadAll(res.Body)
@@ -19,7 +20,15 @@ func TestCreateSession(t *testing.T) {
     err = json.Unmarshal(body, &data)
     fmt.Println("body:", data)
     if res.StatusCode == 200 && err == nil {
-        t.Log("通过")
+        tokenString := data.Content["token"]
+        claims, err := db.Decrypt(fmt.Sprintf("%s", tokenString))
+        if err != nil {
+            t.Error("decrypt失败:", err)
+        } else if claims["id"] == firstUser.Id.Hex() {
+            t.Log("pass")
+        } else {
+            t.Error("user id不正确")
+        }
     } else {
         t.Log(res.StatusCode)
         t.Error(err)

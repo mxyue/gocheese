@@ -29,6 +29,7 @@ func TestGetTodos(t *testing.T) {
 
 	if len(data.Todos) == 1 && res.StatusCode == 200 && err == nil {
 		fmt.Printf("first Content: %v\n", data.Todos[0].Content)
+		t.Log("pass")
 	} else if err != nil {
 		t.Error(err)
 	} else {

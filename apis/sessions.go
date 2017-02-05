@@ -2,7 +2,7 @@ package apis
 
 import (
     "encoding/json"
-    "fmt"
+    "github.com/dgrijalva/jwt-go"
     "gocheese/db"
     "gopkg.in/mgo.v2/bson"
     "net/http"
@@ -15,7 +15,8 @@ func createSession(w http.ResponseWriter, r *http.Request) {
     user := db.FindUser(bson.M{"email": email})
     if user.Email != "" {
         if user.ValidPassword(password) {
-            content := map[string]interface{}{"id": user.Id.Hex()}
+            jwtToken := jwt.MapClaims{"id": user.Id.Hex()}
+            content := map[string]interface{}{"token": db.Encrypt(jwtToken)}
             w.WriteHeader(http.StatusOK)
             json.NewEncoder(w).Encode(ResponseBody{200, "登陆成功", content})
         } else {
