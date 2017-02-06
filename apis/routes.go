@@ -2,7 +2,9 @@ package apis
 
 import (
 	"github.com/gorilla/mux"
-	"gocheese/middleware"
+	// "gocheese/db"
+	"gocheese/util"
+	"net/http"
 )
 
 type ResponseBody struct {
@@ -13,7 +15,14 @@ type ResponseBody struct {
 
 func Handlers() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/todos", middleware.Validate(getTodos)).Methods("GET")
+	// r.HandleFunc("/todos", util.Validate(getTodos)).Methods("GET")
+	// r.HandleFunc("/todos", UserValid(getTodos)).Methods("GET")
+	r.HandleFunc("/todos", func(w http.ResponseWriter, r *http.Request) {
+		user, err := util.ValidUser(w, r)
+		if err == nil {
+			getTodos(w, r, user)
+		}
+	}).Methods("GET")
 	r.HandleFunc("/todos", createTodo).Methods("POST")
 	r.HandleFunc("/todos/{id}", deleteTodo).Methods("DELETE")
 

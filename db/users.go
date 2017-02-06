@@ -51,6 +51,24 @@ func FindUser(query bson.M) User {
 	return user
 }
 
+func FindUserById(id string) (user User, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+	}()
+	bsonObjectID := bson.ObjectIdHex(id)
+	UserColl().FindId(bsonObjectID).One(&user)
+	return user, err
+}
+
 func (user *User) ValidPassword(password string) bool {
 	log.Debug(string(user.Password))
 	err := bcrypt.CompareHashAndPassword(user.Password, []byte(password))

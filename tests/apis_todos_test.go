@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"gocheese/apis"
 	"gocheese/db"
+	"gocheese/util"
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"net/http"
@@ -15,6 +17,9 @@ import (
 func TestGetTodos(t *testing.T) {
 	var client = &http.Client{}
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/todos", server.URL), nil)
+	mapClaims := jwt.MapClaims{"user_id": firstUser.Id.Hex()}
+	tokenStr := util.Encrypt(mapClaims)
+	req.Header.Add("token", tokenStr)
 	checkErr(err)
 	res, err := client.Do(req)
 	checkErr(err)
@@ -26,7 +31,7 @@ func TestGetTodos(t *testing.T) {
 	var data Data
 	err = json.NewDecoder(res.Body).Decode(&data)
 	checkErr(err)
-
+	fmt.Println("response body: ", data.Todos)
 	if len(data.Todos) == 1 && res.StatusCode == 200 && err == nil {
 		fmt.Printf("first Content: %v\n", data.Todos[0].Content)
 		t.Log("pass")
