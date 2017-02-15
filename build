@@ -1,0 +1,12 @@
+if [ ! -f build ]; then
+echo 'build must be run within its container folder' 1>&2
+exit 1
+fi
+
+
+ env GOOS=linux GOARCH=386 go build  
+# env GOOS=linux GOARCH=arm GOARM=7 go build  
+# env GOOS=darwin GOARCH=386  go build  
+
+
+echo 'finished'

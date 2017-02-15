@@ -5,14 +5,13 @@ import (
 	"os"
 )
 
-func init() {
+func logDefine() {
 	log.SetFormatter(&log.JSONFormatter{})
-
-	logfile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE, 0755)
+	logfile, err := os.OpenFile("cheese.log", os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
 	}
 	log.SetOutput(logfile)
 
-	log.SetLevel(log.WarnLevel)
+	log.SetLevel(log.DebugLevel)
 }

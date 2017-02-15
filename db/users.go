@@ -17,12 +17,10 @@ type User struct {
 }
 
 func CreateUser(user User, password string) (interface{}, error) {
-	dbEmailUser := FindUser(bson.M{"email": user.Email})
-	if dbEmailUser.Email != "" {
+	if _, found := FindUser(bson.M{"email": user.Email}); found {
 		return nil, errors.New("该邮箱已经注册")
 	}
-	dbMobileUser := FindUser(bson.M{"mobile": user.Mobile})
-	if dbMobileUser.Mobile != "" {
+	if _, found := FindUser(bson.M{"mobile": user.Mobile}); found {
 		return nil, errors.New("该手机已经注册")
 	}
 	id := bson.NewObjectId()
@@ -45,28 +43,28 @@ func GetAllUsers() []User {
 	return users
 }
 
-func FindUser(query bson.M) User {
-	var user User
+func FindUser(query bson.M) (user User, found bool) {
 	UserColl().Find(query).One(&user)
-	return user
+	if user.Email == "" {
+		found = false
+	} else {
+		found = true
+	}
+	return user, found
 }
 
 func FindUserById(id string) (user User, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
+	if bson.IsObjectIdHex(id) {
+		bsonObjectID := bson.ObjectIdHex(id)
+		UserColl().FindId(bsonObjectID).One(&user)
+		if user.Email == "" {
+			err = errors.New("用户不存在")
 		}
-	}()
-	bsonObjectID := bson.ObjectIdHex(id)
-	UserColl().FindId(bsonObjectID).One(&user)
-	return user, err
+		return user, err
+	} else {
+		return user, errors.New("不正确的id")
+	}
+
 }
 
 func (user *User) ValidPassword(password string) bool {

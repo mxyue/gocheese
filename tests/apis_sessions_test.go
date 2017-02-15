@@ -25,7 +25,7 @@ func TestCreateSession(t *testing.T) {
 		if err != nil {
 			t.Error("decrypt失败:", err)
 		} else if claims["id"] == firstUser.Id.Hex() {
-			t.Log("pass")
+			t.Log("通过")
 		} else {
 			t.Error("user id不正确")
 		}
