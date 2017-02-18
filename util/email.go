@@ -6,10 +6,16 @@ import (
 	"gocheese/config"
 	"math/rand"
 	"net/smtp"
+	"regexp"
 	"time"
 )
 
-func SendCode(email string, site string) error {
+const (
+	email_regular = "^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"
+)
+
+func SendCode(email, site string) error {
+	log.Debug("SendCode email: ", email)
 	rand.Seed(int64(time.Now().Nanosecond()))
 	code := fmt.Sprintf("%d", rand.Intn(9000)+1000)
 	to := []string{email}
@@ -30,4 +36,9 @@ func Send(emails []string, content []byte) error {
 		log.Error(err)
 	}
 	return err
+}
+
+func EmailRegex(email string) bool {
+	reg := regexp.MustCompile(email_regular)
+	return reg.MatchString(email)
 }

@@ -11,9 +11,9 @@ import (
 )
 
 type ResponseBody struct {
-	Code    int
-	Msg     string
-	Content map[string]interface{}
+	Code    int                    `json:"code"`
+	Msg     string                 `json:"msg"`
+	Content map[string]interface{} `json:"content"`
 }
 
 func Handlers() *mux.Router {

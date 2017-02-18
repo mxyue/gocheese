@@ -5,9 +5,14 @@ import (
 	"os"
 )
 
+const (
+	logfile = "product.log"
+)
+
 func logDefine() {
 	log.SetFormatter(&log.JSONFormatter{})
-	logfile, err := os.OpenFile("cheese.log", os.O_WRONLY|os.O_CREATE, 0755)
+	err := os.Remove(logfile)
+	logfile, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
 	}

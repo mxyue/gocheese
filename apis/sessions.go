@@ -2,6 +2,7 @@ package apis
 
 import (
 	"encoding/json"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"gocheese/db"
@@ -14,6 +15,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
+	log.Debug(fmt.Sprintf("email: %s, password: %s", email, password))
 	user, found := db.FindUser(bson.M{"email": email})
 	if found {
 		if user.ValidPassword(password) {

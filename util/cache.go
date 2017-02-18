@@ -14,6 +14,7 @@ func init() {
 }
 
 func CacheSet(namespace, key, value string) {
+	log.Info("CacheSet key: ", key)
 	log.Info("CacheSet value: ", value)
 	cacheBox.Set(space_key(namespace, key), value, cache.DefaultExpiration)
 	code, _ := cacheBox.Get(space_key(namespace, key))
@@ -25,6 +26,7 @@ func CacheGet(namespace, key string) (interface{}, bool) {
 }
 
 func space_key(namespace, key string) string {
+	log.Info("space_key:  ", key)
 	return fmt.Sprintf("%s-%s", namespace, key)
 }
 

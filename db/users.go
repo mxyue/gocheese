@@ -16,12 +16,12 @@ type User struct {
 	CreatedAt time.Time     `bson:"created_at"`
 }
 
-func CreateUser(user User, password string) (interface{}, error) {
+func CreateUser(user User, password string) (string, error) {
 	if _, found := FindUser(bson.M{"email": user.Email}); found {
-		return nil, errors.New("该邮箱已经注册")
+		return "", errors.New("该邮箱已经注册")
 	}
 	if _, found := FindUser(bson.M{"mobile": user.Mobile}); found {
-		return nil, errors.New("该手机已经注册")
+		return "", errors.New("该手机已经注册")
 	}
 	id := bson.NewObjectId()
 	user.Id = id
@@ -30,11 +30,11 @@ func CreateUser(user User, password string) (interface{}, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword(bt_password, bcrypt.DefaultCost)
 	if err != nil {
 		log.Error("create user error", err)
-		return nil, err
+		return "", err
 	}
 	user.Password = hashedPassword
-	doc := UserColl().Insert(user)
-	return doc, nil
+	err = UserColl().Insert(user)
+	return id.Hex(), err
 }
 
 func GetAllUsers() []User {

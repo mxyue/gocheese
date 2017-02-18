@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	address0 = flag.String("a0", ":48567", "Zero address to bind to.")
+	address0 = flag.String("a0", ":5858", "Zero address to bind to.")
 )
 
 func main() {
