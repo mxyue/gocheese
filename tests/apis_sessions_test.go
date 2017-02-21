@@ -24,9 +24,11 @@ func TestCreateSession(t *testing.T) {
 		claims, err := util.Decrypt(fmt.Sprintf("%s", tokenString))
 		if err != nil {
 			t.Error("decrypt失败:", err)
-		} else if claims["id"] == firstUser.Id.Hex() {
+		} else if claims["user_id"] == firstUser.Id.Hex() {
 			t.Log("通过")
 		} else {
+			t.Log("claims:", claims["user_id"])
+			t.Log("first user id: ", firstUser.Id.Hex())
 			t.Error("user id不正确")
 		}
 	} else {

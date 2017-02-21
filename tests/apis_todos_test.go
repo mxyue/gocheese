@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	log "github.com/Sirupsen/logrus"
 )
 
 func TestGetTodos(t *testing.T) {
@@ -52,6 +53,7 @@ func TestCreateTodo(t *testing.T) {
 	err = json.Unmarshal(body, &data)
 	fmt.Println("body:", data)
 	id := data.Content["id"]
+	log.Debug("TestCreateTodo==> :", id)
 	todo, err := db.FindTodoById(fmt.Sprint(id))
 	if res.StatusCode == 200 && err == nil && todo.Content == "新任务" {
 		t.Log("通过")
@@ -77,6 +79,30 @@ func TestDeleteTodo(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestCreateTodoDone(t *testing.T){
+	var todo db.Todo
+	db.TodoColl().Find(bson.M{}).One(&todo)
+	log.Debug("todo dones length", len(todo.Dones))
+	var client = &http.Client{}
+	todo_id := todo.Id.Hex()
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/todos/%s/dones", server.URL, todo_id), nil)
+	req.Header.Add("token", firstUserToken)
+	res, err := client.Do(req)
+	if res.StatusCode == 200 && err == nil {
+		db.TodoColl().Find(bson.M{}).One(&todo)
+		if len(todo.Dones) == 1{
+			log.Debug("new done id ==:", todo.Dones[0].Id.Hex())
+			t.Log("通过")
+		}else{
+			t.Error("失败")
+		}
+	} else {
+		t.Log(res.StatusCode)
+		t.Error(err)
+	}
+}
+
 
 func checkErr(err error) {
 	if err != nil {

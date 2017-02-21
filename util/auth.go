@@ -12,7 +12,6 @@ func ValidUser(w http.ResponseWriter, r *http.Request) (db.User, error) {
 	token := r.Header.Get("token")
 	log.Debug("ValidUser token: ", token)
 	claims, err := Decrypt(token)
-	log.Debug("ValidUser err: ", err)
 	log.Debug("ValidUser user_id: ", claims["user_id"])
 	if err != nil || claims["user_id"] == nil {
 		log.Info("====验证不过===")
