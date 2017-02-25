@@ -21,7 +21,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		if user.ValidPassword(password) {
 			log.Debug("db user id: ", user.Id.Hex())
 			jwtToken := jwt.MapClaims{"user_id": user.Id.Hex()}
-			content := map[string]interface{}{"token": util.Encrypt(jwtToken)}
+			content := map[string]interface{}{"token": util.Encrypt(jwtToken), email: email}
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(ResponseBody{200, "登陆成功", content})
 		} else {
