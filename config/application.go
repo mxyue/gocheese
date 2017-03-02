@@ -3,10 +3,10 @@ package config
 import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
+	"path"
 	"path/filepath"
 	"runtime"
-	"path"
-	"os"
 )
 
 var Settings map[string]string
@@ -16,7 +16,8 @@ var Settings map[string]string
 func loadYml() {
 	var filename string
 	var ok bool
-	filename, err := os.Executable()
+	// filename, err := os.Executable()
+	filename, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	errPanic(err)
 	defer func() {
 		_, filename, _, ok = runtime.Caller(0)
@@ -28,7 +29,7 @@ func loadYml() {
 	readFile(filename)
 }
 
-func readFile(filename string){
+func readFile(filename string) {
 	exPath := path.Dir(filename)
 	setting_file, _ := filepath.Abs(exPath + "/settings.yml")
 	yamlFile, err := ioutil.ReadFile(setting_file)
@@ -36,7 +37,7 @@ func readFile(filename string){
 	errPanic(err)
 }
 
-func errPanic(err error){
+func errPanic(err error) {
 	if err != nil {
 		panic(err)
 	}
