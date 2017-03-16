@@ -6,29 +6,32 @@ import (
 )
 
 var db_name = "gocheese"
+var DbSession *mgo.Session
+var Database *mgo.Database
 
 const (
 	TODOS = "todos"
 	USERS = "users"
 )
 
-func SetDBName(new_name string) {
-	db_name = new_name
-}
-
-var record = func() *mgo.Database {
+func init() {
 	url := "mongodb://localhost"
 	session, err := mgo.Dial(url)
 	if err != nil {
 		fmt.Println(err)
 	}
-	return session.DB(db_name)
+	DbSession = session
+	Database = DbSession.DB(db_name)
+}
+
+func SetDBName(new_name string) {
+	db_name = new_name
 }
 
 var TodoColl = func() *mgo.Collection {
-	return record().C(TODOS)
+	return Database.C(TODOS)
 }
 
 var UserColl = func() *mgo.Collection {
-	return record().C(USERS)
+	return Database.C(USERS)
 }
